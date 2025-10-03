@@ -9,24 +9,41 @@ import scipy as sc # biblioteca matemática
 
 path = kh.dataset_download("fronkongames/steam-games-dataset")
 
-print("Path to dataset files:", path)
+#print("Path to dataset files:", path)
 
 json_path = os.path.join(path, 'games.json')
 
 with open(json_path, 'r', encoding='utf-8') as f:
     dataset = json.load(f)
 
+print(list(dataset.values())[0].keys())
+
 games_list = []
 for app_id, game in dataset.items():
     game_data = {
         'AppID': app_id,
         'Name': game.get('name', ''),
+        'RequiredAge': int(game.get('required_age', 0) or 0),
         'ReleaseDate': game.get('release_date', ''),
         'Price': float(game.get('price', 0) or 0),
+        'DlcCount': int(game.get('dlc_count', 0) or 0),
+        'DetailedDescription': game.get('detailed_description', ''),
+        'AboutTheGame': game.get('about_the_game', ''),
+        'Reviews': game.get('reviews', ''),
+        'HeaderImage': game.get('header_image', ''),
+        'Website': game.get('website', ''),
+        'Achievements': game.get('achievements', ''),
+        'Recommendations': game.get('recommendations', ''),
+        'Notes': game.get('notes', ''),
+        'SupportedLanguages': game.get('supported_languages', ''),
+        'Developers': game.get('developers', ''),
+        'Publishers': game.get('publishers', ''),
+        'EstimatedOwners': game.get('estimated_owners', ''),
         'Positive': int(game.get('positive', 0) or 0),
+        'Tags': game.get('tags', ''),
         'Negative': int(game.get('negative', 0) or 0),
         'MetacriticScore': game.get('metacritic_score') if game.get('metacritic_score') not in [None, ""] else np.nan,
-        'PeakCCU': int(game.get('peak_ccu', 0) or 0),
+        'PeakCCU': int(game.get('peak_ccu', 0) or 0), # Número máximo de usuários simultâneos
         'AveragePlaytimeForever': int(game.get('average_playtime_forever', 0) or 0),
         'AveragePlaytime2Weeks': int(game.get('average_playtime_2weeks', 0) or 0),
         'MedianPlaytimeForever': int(game.get('median_playtime_forever', 0) or 0),
