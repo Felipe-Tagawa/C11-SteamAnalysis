@@ -1,6 +1,7 @@
-pandas
-numpy
-matplotlib
-seaborn
-kagglehub
-scipy
+pandas~=2.3.2
+numpy~=2.3.2
+matplotlib~=3.10.6
+seaborn~=0.13.2
+kagglehub~=0.3.13
+scipy~=1.16.2
+plotly~=6.3.1
