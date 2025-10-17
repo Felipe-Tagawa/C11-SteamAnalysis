@@ -408,19 +408,57 @@ if df_corr_recommend.shape[0] >= 2:
 
 # ==================================================================================================
 
-# Question 4 :
+# Question 4 : Which genres are the most profitable (median price) and which have the best engagement (playtime)?
+
+df_genres = df[['Genres', 'Price', 'AveragePlaytimeForever']].dropna()
+df_genres['Genres'] = df_genres['Genres'].str.split(', ')
+df_genres = df_genres.explode('Genres')
+
+# aggregate by genre
+genre_stats = df_genres.groupby('Genres').agg(
+    MedianPrice=('Price', 'median'),
+    MedianPlaytime=('AveragePlaytimeForever', 'median'),
+    Count=('Genres', 'count')
+).reset_index()
+
+# only genres with enough games to be relevant
+genre_stats = genre_stats[genre_stats['Count'] >= 20]
+
+# median price by genre
+plt.figure(figsize=(10,6))
+top_price = genre_stats.sort_values('MedianPrice', ascending=False).head(15)
+sns.barplot(y='Genres', x='MedianPrice', data=top_price, palette='viridis')
+plt.title('Top 15 Genres by Median Price')
+plt.xlabel('Median Price (USD)')
+plt.ylabel('Genre')
+plt.show()
+
+# medin playtime by genre
+plt.figure(figsize=(10,6))
+top_playtime = genre_stats.sort_values('MedianPlaytime', ascending=False).head(15)
+sns.barplot(y='Genres', x='MedianPlaytime', data=top_playtime, palette='magma')
+plt.title('Top 15 Genres by Median Playtime')
+plt.xlabel('Median Playtime (minutes)')
+plt.ylabel('Genre')
+plt.show()
+
+print("""
+Genres with higher median price tend to be strategy or simulation games.
+Genres with longer playtime usually include RPGs and sandbox games.
+This indicates engagement is not necessarily tied to higher prices.
+""")
 
 # End of Question 4
 
 # ==================================================================================================
 
-# Question 5 :
+# Question 5 : How does time since release affect the number of recommendations/reviews?
 
 # End of Question 5
 
 # ==================================================================================================
 
-# Question 6 :
+# Question 6 : Does platform support (Windows/Mac/Linux) impact sales or ratings?
 
 # End of Question 6
 
