@@ -153,7 +153,6 @@ ax1.legend()
 plt.tight_layout()
 plt.show()
 
-fig1.savefig("steam_games_distribution.png")
 
 # ============================================
 # Visualization 2: Price vs Metacritic Rating (Plotly)
@@ -400,9 +399,6 @@ if df_corr_recommend.shape[0] >= 2:
 
     plt.grid(True, alpha=0.3)
     plt.show()
-
-    # Save figure to PNG for report or presentation use
-    plt.savefig("steam_games_positive_reviews_vs_recommendations.png")
 
 # End of Question 3
 
