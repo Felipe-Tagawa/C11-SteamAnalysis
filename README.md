@@ -1,64 +1,51 @@
-# 📊 Análise Mercadológica de Jogos na Steam
+```{"id":"48329","variant":"standard","title":"Steam Market Analysis (English Version)"}
+# 📊 Steam Game Market Analysis
 
-Este projeto tem como objetivo realizar uma análise de dados do mercado de jogos na **Steam**, com foco especial em fornecer **insights relevantes para desenvolvedores brasileiros**.
+This project aims to perform a comprehensive **data analysis of the Steam game market**, with a special focus on providing **relevant insights for Brazilian developers**.
 
-Ao longo da pesquisa, buscamos responder a perguntas que envolvem **estratégias de preço, engajamento, gêneros saturados, impacto de DLCs, suporte a plataformas** e muito mais. A ideia é entender quais fatores realmente influenciam a popularidade e o sucesso de um jogo dentro da plataforma.
-
----
-
-## 🎯 Objetivos
-
-- Mapear **tendências de mercado** que possam orientar desenvolvedores independentes.
-    
-- Avaliar a **eficácia de diferentes modelos de negócio**, como _Free-to-Play_, _premium_ e uso de DLCs.
-    
-- Compreender **quais elementos agregam mais valor percebido** pelos jogadores, seja em jogabilidade, preço ou suporte.
-    
-- Identificar **nichos de oportunidade** menos explorados no mercado.
-    
+Throughout the research, we seek to answer questions related to **pricing strategies, player engagement, market saturation by genre, DLC impact, platform support**, and more. The goal is to understand which factors truly influence a game's **popularity and success** on the platform.
 
 ---
 
-## 🗂️ Estrutura dos Dados
+## 🎯 Objectives
 
-As análises foram realizadas utilizando um dataset contendo informações de jogos da Steam, com colunas relevantes como:
-
-- **Preço e modelo de venda:** `price`, `dlcCount`, `categories`
-    
-- **Engajamento:** `averagePlaytimeForever`, `medianPlaytimeForever`, `averagePlaytime2W`, `achievements`, `peakCCU`
-    
-- **Qualidade percebida:** `positive`, `negative`, `scoreRank`, `metacriticScore`, `recommens`
-    
-- **Mercado e alcance:** `estimatedOwners`, `required_age`, `releaseDate`, `supportWindows`, `supportMac`, `supportLinux`
-    
-- **Características extras:** `genres`, `tags`, `fullAudioLanguages`, `languages`, `website`, `supportWeb`, `supportEmail`
-    
+- Map **market trends** that can guide independent developers.  
+- Evaluate the **effectiveness of different business models**, such as _Free-to-Play_, _premium_, and the use of DLCs.  
+- Understand **which elements add the most perceived value** to players — whether gameplay, price, or platform support.  
+- Identify **underserved market niches** with growth potential.  
 
 ---
 
-## 🔍 Perguntas de Pesquisa
+## 🗂️ Data Structure
 
-A seguir, estão as **10 perguntas centrais** que direcionam nossa análise:
+The analyses were conducted using a dataset containing information on Steam games, with relevant columns such as:
 
-    
-
----
-
-## 🚀 Relevância para Desenvolvedores Brasileiros
-
-- 🎮 O mercado de **PC/Steam** é mais acessível para indies do que consoles.
-    
-- 🇧🇷 Desenvolvedores brasileiros muitas vezes não têm acesso a publishers grandes, então entender as vantagens competitivas reais pode orientar decisões estratégicas.
-    
-- 💡 Identificar **nichos menos explorados** e **modelos de monetização eficazes** pode reduzir riscos e aumentar as chances de sucesso.
-    
-- 🌍 O impacto da **localização (tradução e dublagem)** pode ser especialmente relevante para atingir mercados internacionais.
-    
+- **Price and sales model:** `price`, `dlcCount`, `categories`  
+- **Engagement:** `averagePlaytimeForever`, `medianPlaytimeForever`, `averagePlaytime2W`, `achievements`, `peakCCU`  
+- **Perceived quality:** `positive`, `negative`, `scoreRank`, `metacriticScore`, `recommendations`  
+- **Market and reach:** `estimatedOwners`, `required_age`, `releaseDate`, `supportWindows`, `supportMac`, `supportLinux`  
+- **Additional features:** `genres`, `tags`, `fullAudioLanguages`, `languages`, `website`, `supportWeb`, `supportEmail`  
 
 ---
 
-## 📌 Conclusão
+## 🔍 Research Questions
 
-Este estudo busca **mapear padrões do mercado Steam** para oferecer uma base sólida de tomada de decisão a novos desenvolvedores, especialmente aqueles que pretendem lançar jogos **independentes no Brasil**.
+Below are the **10 core questions** that guide this analysis:
 
-As respostas para essas perguntas servirão como um **guia estratégico**, ajudando a reduzir incertezas e aproveitando melhor as oportunidades do mercado global de games.
+---
+
+## 🚀 Relevance for Brazilian Developers
+
+- 🎮 The **PC/Steam** market is more accessible for indie developers compared to consoles.  
+- 🇧🇷 Brazilian developers often lack access to major publishers, so understanding **real competitive advantages** can guide strategic decisions.  
+- 💡 Identifying **less saturated niches** and **effective monetization models** can reduce risks and increase success rates.  
+- 🌍 The impact of **localization (translation and dubbing)** can be especially important for reaching international audiences.  
+
+---
+
+## 📌 Conclusion
+
+This study aims to **map patterns in the Steam market** to provide a solid decision-making foundation for new developers, especially those planning to release **independent games in Brazil**.
+
+The answers to these questions will serve as a **strategic guide**, helping reduce uncertainty and better seize opportunities in the global gaming market.
+```
