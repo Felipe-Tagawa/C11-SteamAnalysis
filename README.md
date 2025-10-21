@@ -1,4 +1,3 @@
-```{"id":"48329","variant":"standard","title":"Steam Market Analysis (English Version)"}
 # 📊 Steam Game Market Analysis
 
 This project aims to perform a comprehensive **data analysis of the Steam game market**, with a special focus on providing **relevant insights for Brazilian developers**.
@@ -48,4 +47,3 @@ Below are the **10 core questions** that guide this analysis:
 This study aims to **map patterns in the Steam market** to provide a solid decision-making foundation for new developers, especially those planning to release **independent games in Brazil**.
 
 The answers to these questions will serve as a **strategic guide**, helping reduce uncertainty and better seize opportunities in the global gaming market.
-```
