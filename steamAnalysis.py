@@ -194,9 +194,6 @@ fig2.update_layout(
 
 fig2.show()
 
-# Transform plot into png
-fig2.write_image("steam_games_distribution per metacritic rating.png")
-
 # End of Question 1
 
 # ==================================================================================================
