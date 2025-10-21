@@ -84,11 +84,16 @@ without_ach = df[df['Achievements'] == 0].copy()
 with_ach['ReviewRatio'] = with_ach['Positive'] / (with_ach['Positive'] + with_ach['Negative'])
 without_ach['ReviewRatio'] = without_ach['Positive'] / (without_ach['Positive'] + without_ach['Negative'])
 
-# Remove games with no reviews (but keep games with 0 playtime for now)
-with_ach = with_ach.replace([np.inf, -np.inf], np.nan).dropna(subset=['ReviewRatio'])
-without_ach = without_ach.replace([np.inf, -np.inf], np.nan).dropna(subset=['ReviewRatio'])
+# Removing games with no reviews
+# Remove lines where review ratio is nan
+with_ach = with_ach[with_ach['ReviewRatio'].notna()]
+without_ach = without_ach[without_ach['ReviewRatio'].notna()]
 
-# Filter only games with playtime > 0 for meaningful comparison
+# Remove lines where review ratio is infinite
+with_ach = with_ach[~with_ach['ReviewRatio'].isin([float('inf'), float('-inf')])]
+without_ach = without_ach[~without_ach['ReviewRatio'].isin([float('inf'), float('-inf')])]
+
+# Filter only games with playtime > 0
 with_ach_playtime = with_ach[with_ach['MedianPlaytimeForever'] > 0]
 without_ach_playtime = without_ach[without_ach['MedianPlaytimeForever'] > 0]
 
@@ -121,53 +126,65 @@ plt.figure(figsize=(14, 10))
 
 # 1. Median Playtime
 plt.subplot(2, 2, 1)
-playtime_values = [metrics_with['Median Playtime'], metrics_without['Median Playtime']]
-bars1 = plt.bar(categories, playtime_values, color=colors)
+playtime_values = [metrics_with['Median Playtime'], metrics_without['Median Playtime']]  # list with both playtime values
+bars1 = plt.bar(categories, playtime_values, color=colors)  # creating a bar graph and saving the bars
 plt.title('Median Playtime Comparison', fontsize=12, fontweight='bold')
 plt.ylabel('Minutes', fontsize=10)
 
 # Add value labels on bars
 for bar in bars1:
-    height = bar.get_height()
+    height = bar.get_height()  # Height for each bar in the graph
+
+    # Writing the value above the bar
     plt.text(bar.get_x() + bar.get_width()/2., height, f'{height:,.0f}', ha='center', va='bottom', fontsize=9)
 
 # 2. Average Recommendations
 plt.subplot(2, 2, 2)
-rec_values = [metrics_with['Avg Recommendations'], metrics_without['Avg Recommendations']]
-bars2 = plt.bar(categories, rec_values, color=colors)
+rec_values = [metrics_with['Avg Recommendations'], metrics_without['Avg Recommendations']]  # list with both recommendation values
+bars2 = plt.bar(categories, rec_values, color=colors)  # creating a bar graph and saving the bars
 plt.title('Average Recommendations Comparison', fontsize=12, fontweight='bold')
 plt.ylabel('Recommendations', fontsize=10)
 
+# Add value labels on bars
 for bar in bars2:
-    height = bar.get_height()
+    height = bar.get_height()  # Height for each bar in the graph
+
+    # Writing the value above the bar
     plt.text(bar.get_x() + bar.get_width()/2., height, f'{height:,.0f}', ha='center', va='bottom', fontsize=9)
 
 # 3. Average Review Ratio
 plt.subplot(2, 2, 3)
-ratio_values = [metrics_with['Avg Review Ratio'], metrics_without['Avg Review Ratio']]
-bars3 = plt.bar(categories, ratio_values, color=colors)
+ratio_values = [metrics_with['Avg Review Ratio'], metrics_without['Avg Review Ratio']]  # list with both review ratio values
+bars3 = plt.bar(categories, ratio_values, color=colors)  # creating a bar graph and saving the bars
 plt.title('Average Review Ratio Comparison', fontsize=12, fontweight='bold')
 plt.ylabel('Ratio (0-1)', fontsize=10)
 plt.ylim(0, 1)
 
+# Add value labels on bars
 for bar in bars3:
-    height = bar.get_height()
-    plt.text(bar.get_x() + bar.get_width()/2., height, f'{height:.3f}',  ha='center', va='bottom', fontsize=9)
+    height = bar.get_height()  # Height for each bar in the graph
+
+    # Writing the value above the bar
+    plt.text(bar.get_x() + bar.get_width()/2., height, f'{height:.3f}', ha='center', va='bottom', fontsize=9)
 
 # 4. Number of Games
 plt.subplot(2, 2, 4)
-count_values = [len(with_ach), len(without_ach)]
-bars4 = plt.bar(categories, count_values, color=colors)
+count_values = [len(with_ach), len(without_ach)]  # list with both game count values
+bars4 = plt.bar(categories, count_values, color=colors)  # creating a bar graph and saving the bars
 plt.title('Number of Games in Each Category', fontsize=12, fontweight='bold')
 plt.ylabel('Count', fontsize=10)
 
+# Add value labels on bars
 for bar in bars4:
-    height = bar.get_height()
-    plt.text(bar.get_x() + bar.get_width()/2., height,f'{int(height):,}', ha='center', va='bottom', fontsize=9)
+    height = bar.get_height()  # Height for each bar in the graph
 
-plt.tight_layout()
-plt.savefig('question7_achievements_comparison.png', dpi=300, bbox_inches='tight')
-plt.show()
+    # Writing the value above the bar
+    plt.text(bar.get_x() + bar.get_width()/2., height, f'{int(height):,}', ha='center', va='bottom', fontsize=9)
+
+# Final adjustments
+plt.tight_layout()  # Adjust layout to prevent overlap
+plt.savefig('question7_achievements_comparison.png', dpi=300, bbox_inches='tight')  # Save the figure with high resolution
+plt.show()  # Display the plot
 
 # ==================================================================================================
 # Question 8: Is it worth investing in DLCs? Do they really increase game lifespan and revenue?
@@ -189,18 +206,20 @@ def owners_to_number(owners):
 with_dlc = df[df['DlcCount'] > 0].copy()
 without_dlc = df[df['DlcCount'] == 0].copy()
 
+# converting owners to a numeric value instead of a string
 with_dlc['EstimatedOwnersNumeric'] = with_dlc['EstimatedOwners'].apply(owners_to_number)
 without_dlc['EstimatedOwnersNumeric'] = without_dlc['EstimatedOwners'].apply(owners_to_number)
 
-# Calculate Review Ratio
+# Calculating Review Ratio
 with_dlc['ReviewRatio'] = with_dlc['Positive'] / (with_dlc['Positive'] + with_dlc['Negative'])
 without_dlc['ReviewRatio'] = without_dlc['Positive'] / (without_dlc['Positive'] + without_dlc['Negative'])
 
-# Clean data
+# Cleaning data
+# Replacing infinite values with nan and then removing the lines without values in review ratio or owners
 with_dlc = with_dlc.replace([np.inf, -np.inf], np.nan).dropna(subset=['ReviewRatio', 'EstimatedOwnersNumeric'])
 without_dlc = without_dlc.replace([np.inf, -np.inf], np.nan).dropna(subset=['ReviewRatio', 'EstimatedOwnersNumeric'])
 
-# Filter games with playtime > 0 for meaningful comparison
+# Filter games with playtime > 0
 with_dlc_playtime = with_dlc[with_dlc['MedianPlaytimeForever'] > 0]
 without_dlc_playtime = without_dlc[without_dlc['MedianPlaytimeForever'] > 0]
 
@@ -235,52 +254,65 @@ plt.figure(figsize=(14, 10))
 
 # 1. Median Playtime
 plt.subplot(2, 2, 1)
-playtime_values_dlc = [metrics_with_dlc['Median Playtime'], metrics_without_dlc['Median Playtime']]
-bars1 = plt.bar(categories_dlc, playtime_values_dlc, color=colors_dlc)
+playtime_values_dlc = [metrics_with_dlc['Median Playtime'], metrics_without_dlc['Median Playtime']]  # list with both playtime values
+bars1 = plt.bar(categories_dlc, playtime_values_dlc, color=colors_dlc)  # creating a bar graph and saving the bars
 plt.title('Median Playtime Comparison (DLC)', fontsize=12, fontweight='bold')
 plt.ylabel('Minutes', fontsize=10)
 
+# Add value labels on bars
 for bar in bars1:
-    height = bar.get_height()
+    height = bar.get_height()  # Height for each bar in the graph
+
+    # Writing the value above the bar
     plt.text(bar.get_x() + bar.get_width()/2., height, f'{height:,.0f}', ha='center', va='bottom', fontsize=9)
 
 # 2. Average Price
 plt.subplot(2, 2, 2)
-price_values = [metrics_with_dlc['Avg Price'], metrics_without_dlc['Avg Price']]
-bars2 = plt.bar(categories_dlc, price_values, color=colors_dlc)
+price_values = [metrics_with_dlc['Avg Price'], metrics_without_dlc['Avg Price']]  # list with both price values
+bars2 = plt.bar(categories_dlc, price_values, color=colors_dlc)  # creating a bar graph and saving the bars
 plt.title('Average Price Comparison (DLC)', fontsize=12, fontweight='bold')
 plt.ylabel('Price (USD)', fontsize=10)
 
+# Add value labels on bars
 for bar in bars2:
-    height = bar.get_height()
+    height = bar.get_height()  # Height for each bar in the graph
+
+    # Writing the value above the bar
     plt.text(bar.get_x() + bar.get_width()/2., height, f'${height:,.2f}', ha='center', va='bottom', fontsize=9)
 
 # 3. Average Estimated Owners
 plt.subplot(2, 2, 3)
-owners_values = [metrics_with_dlc['Avg Estimated Owners'], metrics_without_dlc['Avg Estimated Owners']]
-bars3 = plt.bar(categories_dlc, owners_values, color=colors_dlc)
+owners_values = [metrics_with_dlc['Avg Estimated Owners'], metrics_without_dlc['Avg Estimated Owners']]  # list with both estimated owner values
+bars3 = plt.bar(categories_dlc, owners_values, color=colors_dlc)  # creating a bar graph and saving the bars
 plt.title('Average Estimated Owners Comparison (DLC)', fontsize=12, fontweight='bold')
 plt.ylabel('Estimated Owners', fontsize=10)
 
+# Add value labels on bars
 for bar in bars3:
-    height = bar.get_height()
-    plt.text(bar.get_x() + bar.get_width()/2., height,f'{height:,.0f}', ha='center', va='bottom', fontsize=9)
+    height = bar.get_height()  # Height for each bar in the graph
+
+    # Writing the value above the bar
+    plt.text(bar.get_x() + bar.get_width()/2., height, f'{height:,.0f}', ha='center', va='bottom', fontsize=9)
 
 # 4. Average Review Ratio
 plt.subplot(2, 2, 4)
-ratio_values_dlc = [metrics_with_dlc['Avg Review Ratio'], metrics_without_dlc['Avg Review Ratio']]
-bars4 = plt.bar(categories_dlc, ratio_values_dlc, color=colors_dlc)
+ratio_values_dlc = [metrics_with_dlc['Avg Review Ratio'], metrics_without_dlc['Avg Review Ratio']]  # list with both review ratio values
+bars4 = plt.bar(categories_dlc, ratio_values_dlc, color=colors_dlc)  # creating a bar graph and saving the bars
 plt.title('Average Review Ratio Comparison (DLC)', fontsize=12, fontweight='bold')
 plt.ylabel('Ratio (0-1)', fontsize=10)
 plt.ylim(0, 1)
 
+# Add value labels on bars
 for bar in bars4:
-    height = bar.get_height()
-    plt.text(bar.get_x() + bar.get_width()/2., height,f'{height:.3f}', ha='center', va='bottom', fontsize=9)
+    height = bar.get_height()  # Height for each bar in the graph
 
-plt.tight_layout()
-plt.savefig('question8_dlc_comparison.png', dpi=300, bbox_inches='tight')
-plt.show()
+    # Writing the value above the bar
+    plt.text(bar.get_x() + bar.get_width()/2., height, f'{height:.3f}', ha='center', va='bottom', fontsize=9)
+
+# Final adjustments
+plt.tight_layout()  # Adjust layout to prevent overlap
+plt.savefig('question8_dlc_comparison.png', dpi=300, bbox_inches='tight')  # Save the figure with high resolution
+plt.show()  # Display the plot
 
 # ==================================================================================================
 # Question 9: What price range maximizes the relationship between player satisfaction and sales volume?
@@ -291,25 +323,26 @@ print("\n" + "=" * 80)
 print("Question 9: Price range and relationship between satisfaction and sales volume")
 print("=" * 80)
 
-# Convert EstimatedOwners to numeric
+# Converting EstimatedOwners to numeric instead of string
 df["EstimatedOwnersNumeric"] = df["EstimatedOwners"].apply(owners_to_number)
 
 # Ensure necessary columns exist
 df["ReviewRatio"] = df["Positive"] / (df["Positive"] + df["Negative"])
 df["ReviewRatio"] = df["ReviewRatio"].replace([np.inf, -np.inf], np.nan)
 
-# Create price ranges
+# Creating price ranges
 df["PriceRange"] = pd.cut(df["Price"], bins=[0, 5, 10, 20, 40, float("inf")], labels=["$0-5", "$5-10", "$10-20", "$20-40", "$40+"])
 
 # Filter only valid data
 valid_data = df.dropna(subset=["ReviewRatio", "EstimatedOwnersNumeric", "Recommendations", "PriceRange"])
 
 # Calculate averages by price range
+# Grouping by price range and aggregating the mean of ReviewRatio, owners, and Recommendations
 stats = valid_data.groupby("PriceRange", observed=True).agg({
     "ReviewRatio": "mean",
     "EstimatedOwnersNumeric": "mean",
     "Recommendations": "mean"
-}).reset_index()
+}).reset_index() # Turn PriceRange back to a normal column
 
 print("\nMetrics by price range:")
 print(stats)
@@ -360,6 +393,7 @@ stats["BalanceScore"] = (
 
 best_range = stats.loc[stats["BalanceScore"].idxmax()]
 
+# printing best stats to the game: ideal price , review ratio, avarage owners and recommendations
 print(f"\nIdeal price range: {best_range['PriceRange']}")
 print(f"  Review Ratio: {best_range['ReviewRatio']:.3f}")
 print(f"  Average owners: {best_range['EstimatedOwnersNumeric']:,.0f}")
