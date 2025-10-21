@@ -53,6 +53,7 @@ for app_id, game in dataset.items():
         'MedianPlaytimeForever': safe_int(game.get('median_playtime_forever', 0)),
         'AveragePlaytimeForever': safe_int(game.get('average_playtime_forever', 0)),
         'Genres': ', '.join(game.get('genres', [])),
+        'SupportedLanguages': ', '.join(game.get('supported_languages', [])),
         # Simplified handling for list fields, assuming they are lists or empty strings
         'Screenshots': len(game.get('screenshots', [])),
         'Movies': len(game.get('movies', []))
