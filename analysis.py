@@ -374,8 +374,8 @@ stats_norm["RecsNorm"] = stats["Recommendations"] / stats["Recommendations"].max
 
 plt.subplot(2, 2, 4)
 plt.plot(stats["PriceRange"], stats["ReviewRatio"], marker="o", label="Satisfaction", color="blue")
-plt.plot(stats["PriceRange"], stats_norm["OwnersNorm"], marker="s", label="Owners (norm.)", color="orange")
-plt.plot(stats["PriceRange"], stats_norm["RecsNorm"], marker="^", label="Recommendations (norm.)", color="green")
+plt.plot(stats["PriceRange"], stats_norm["OwnersNorm"], marker="s", label="Owners", color="orange")
+plt.plot(stats["PriceRange"], stats_norm["RecsNorm"], marker="^", label="Recommendations", color="green")
 plt.title("Normalized Comparison by Price Range")
 plt.ylabel("Normalized Value (0-1)")
 plt.legend()
@@ -407,13 +407,15 @@ print("Question 10: Supported languages, global reach, and ratings")
 print("=" * 80)
 
 # Slicing and Expansion (Exploding the Languages)
-df['SupportedLanguages_Clean'] = df['SupportedLanguages'].astype(str).str.replace(' ', '')
-df['SupportedLanguages_List'] = df['SupportedLanguages_Clean'].str.split(',')
+df['SupportedLanguages_List'] = df['SupportedLanguages'].str.split(', ')
 df_expanded = df.explode('SupportedLanguages_List').rename(columns={'SupportedLanguages_List': 'Language'})
 
 # Filtering where the language is empty or NaN after the explode
+df_expanded = df_expanded[df_expanded['Language'].notna()]
 df_expanded = df_expanded[df_expanded['Language'] != '']
-df_expanded = df_expanded.dropna(subset=['Language'])
+
+# Remove any leading/trailing whitespace
+df_expanded['Language'] = df_expanded['Language'].str.strip()
 
 # Calculating Review Ratio on the expanded DataFrame
 df_expanded["ReviewRatio"] = df_expanded["Positive"] / (df_expanded["Positive"] + df_expanded["Negative"])
@@ -423,8 +425,8 @@ df_expanded["ReviewRatio"] = df_expanded["ReviewRatio"].replace([np.inf, -np.inf
 # Grouping by language and aggregating the mean of ReviewRatio, Owners, and Recommendations
 language_stats = df_expanded.groupby("Language", observed=True).agg({
     "ReviewRatio": "mean",
-    "EstimatedOwnersNumeric": "mean",
-    "Recommendations": "mean",
+    "EstimatedOwnersNumeric": "sum",
+    "Recommendations": "sum",
     "AppID": "count" # Number of games supporting this language
 }).rename(columns={"AppID": "GameCount"}).reset_index()
 
@@ -432,7 +434,7 @@ language_stats = df_expanded.groupby("Language", observed=True).agg({
 relevant_languages = language_stats[language_stats["GameCount"] >= 50].copy()
 
 print(f"\nMetrics for relevant languages (>= 50 games):")
-print(relevant_languages.sort_values(by="EstimatedOwnersNumeric", ascending=False).head(10))
+print(relevant_languages.sort_values(by="Recommendations", ascending=False).head(10))
 
 # Determine the Ideal Language (Sweet Spot) / Normalize metrics
 relevant_languages["OwnersNorm"] = relevant_languages["EstimatedOwnersNumeric"] / relevant_languages["EstimatedOwnersNumeric"].max()
