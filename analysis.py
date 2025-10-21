@@ -183,7 +183,7 @@ for bar in bars4:
 
 # Final adjustments
 plt.tight_layout()  # Adjust layout to prevent overlap
-plt.savefig('question7_achievements_comparison.png', dpi=300, bbox_inches='tight')  # Save the figure with high resolution
+#plt.savefig('question7_achievements_comparison.png', dpi=300, bbox_inches='tight')  # Save the figure with high resolution
 plt.show()  # Display the plot
 
 # ==================================================================================================
