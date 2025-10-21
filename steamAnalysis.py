@@ -176,9 +176,6 @@ fig2.update_layout(
 
 fig2.show()
 
-# Transform plot into png
-fig2.write_image("steam_games_distribution per metacritic rating.png")
-
 # End of Question 1
 
 # ==================================================================================================
@@ -401,8 +398,6 @@ if df_corr_recommend.shape[0] >= 2:
     plt.grid(True, alpha=0.3)
     plt.show()
 
-    # Save figure to PNG for report or presentation use
-    plt.savefig("steam_games_positive_reviews_vs_recommendations.png")
 
 # End of Question 3
 
