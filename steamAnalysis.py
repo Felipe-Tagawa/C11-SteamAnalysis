@@ -27,14 +27,32 @@ with open(json_path, 'r', encoding='utf-8') as f:
 # 3. DataFrame Conversion
 # ==============================>
 
+
 games_list = []
 for app_id, game in dataset.items():
+
+    price = game.get('price', 0)
+    try:
+        # alguns preços vêm como 'Free' ou strings tipo '0.0'
+        price = float(price) if price not in ["Free", ""] else 0.0
+    except (ValueError, TypeError):
+        price = 0.0
+
+    # === Trata MetacriticScore (converte string para número ou NaN) ===
+    meta = game.get('metacritic_score')
+    try:
+        meta = float(meta)
+    except (ValueError, TypeError):
+        meta = np.nan
+
+    # === Monta o dicionário principal ===
     game_data = {
         'AppID': app_id,
         'Name': game.get('name', ''),
         'RequiredAge': int(game.get('required_age', 0) or 0),
         'ReleaseDate': game.get('release_date', ''),
-        'Price': float(game.get('price', 0) or 0),
+        'Price': price,
+        'MetacriticScore': meta,
         'DlcCount': int(game.get('dlc_count', 0) or 0),
         'DetailedDescription': game.get('detailed_description', ''),
         'AboutTheGame': game.get('about_the_game', ''),
@@ -50,7 +68,6 @@ for app_id, game in dataset.items():
         'EstimatedOwners': game.get('estimated_owners', ''),
         'Positive': int(game.get('positive', 0) or 0),
         'Negative': int(game.get('negative', 0) or 0),
-        'MetacriticScore': game.get('metacritic_score') if game.get('metacritic_score') not in [None, ""] else np.nan,
         'PeakCCU': int(game.get('peak_ccu', 0) or 0),
         'AveragePlaytimeForever': int(game.get('average_playtime_forever', 0) or 0),
         'AveragePlaytime2Weeks': int(game.get('average_playtime_2weeks', 0) or 0),
@@ -61,10 +78,12 @@ for app_id, game in dataset.items():
         'Screenshots': len(game.get('screenshots', [])) if isinstance(game.get('screenshots'), list) else 0,
         'Movies': len(game.get('movies', [])) if isinstance(game.get('movies'), list) else 0
     }
+
     games_list.append(game_data)
 
 df = pd.DataFrame(games_list)
 print(f"📊 DataFrame: {df.shape[0]} lines and {df.shape[1]} columns")
+
 
 # ==============================>
 # 4. Save CSV
@@ -153,7 +172,6 @@ ax1.legend()
 plt.tight_layout()
 plt.show()
 
-fig1.savefig("steam_games_distribution.png")
 
 # ============================================
 # Visualization 2: Price vs Metacritic Rating (Plotly)
@@ -397,7 +415,6 @@ if df_corr_recommend.shape[0] >= 2:
 
     plt.grid(True, alpha=0.3)
     plt.show()
-
 
 # End of Question 3
 
