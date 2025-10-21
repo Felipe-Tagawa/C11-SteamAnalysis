@@ -53,6 +53,7 @@ for app_id, game in dataset.items():
         'MedianPlaytimeForever': safe_int(game.get('median_playtime_forever', 0)),
         'AveragePlaytimeForever': safe_int(game.get('average_playtime_forever', 0)),
         'Genres': ', '.join(game.get('genres', [])),
+        'SupportedLanguages': ', '.join(game.get('supported_languages', [])),
         # Simplified handling for list fields, assuming they are lists or empty strings
         'Screenshots': len(game.get('screenshots', [])),
         'Movies': len(game.get('movies', []))
@@ -183,7 +184,6 @@ for bar in bars4:
 
 # Final adjustments
 plt.tight_layout()  # Adjust layout to prevent overlap
-#plt.savefig('question7_achievements_comparison.png', dpi=300, bbox_inches='tight')  # Save the figure with high resolution
 plt.show()  # Display the plot
 
 # ==================================================================================================
@@ -311,7 +311,6 @@ for bar in bars4:
 
 # Final adjustments
 plt.tight_layout()  # Adjust layout to prevent overlap
-plt.savefig('question8_dlc_comparison.png', dpi=300, bbox_inches='tight')  # Save the figure with high resolution
 plt.show()  # Display the plot
 
 # ==================================================================================================
@@ -403,29 +402,79 @@ print(f"  Average recommendations: {best_range['Recommendations']:,.0f}")
 
 # Question 10: Which supported languages generate greater global reach without compromising ratings?
 
-# TODO: Step 1 - Parse SupportedLanguages column
-# Extract individual languages from the text (may contain HTML tags)
-# Focus on: English, Portuguese-Brazil, Spanish, Chinese, Russian, German, French, Japanese
+print("\n" + "=" * 80)
+print("Question 10: Supported languages, global reach, and ratings")
+print("=" * 80)
 
-# TODO: Step 2 - Create binary columns for key languages
-# df['HasEnglish'], df['HasPortuguese'], df['HasSpanish'], etc.
+# Slicing and Expansion (Exploding the Languages)
+df['SupportedLanguages_Clean'] = df['SupportedLanguages'].astype(str).str.replace(' ', '')
+df['SupportedLanguages_List'] = df['SupportedLanguages_Clean'].str.split(',')
+df_expanded = df.explode('SupportedLanguages_List').rename(columns={'SupportedLanguages_List': 'Language'})
 
-# TODO: Step 3 - Calculate Review Ratio (if not already done in Question 9)
+# Filtering where the language is empty or NaN after the explode
+df_expanded = df_expanded[df_expanded['Language'] != '']
+df_expanded = df_expanded.dropna(subset=['Language'])
 
-# TODO: Step 4 - Analyze PT-BR impact specifically
-# Compare games with PT-BR vs without: EstimatedOwners, ReviewRatio, Recommendations
+# Calculating Review Ratio on the expanded DataFrame
+df_expanded["ReviewRatio"] = df_expanded["Positive"] / (df_expanded["Positive"] + df_expanded["Negative"])
+df_expanded["ReviewRatio"] = df_expanded["ReviewRatio"].replace([np.inf, -np.inf], np.nan)
 
-# TODO: Step 5 - Find top 5 languages correlated with high Recommendations
-# For each language, calculate mean Recommendations and mean ReviewRatio
+# Aggregating Metrics by Language
+# Grouping by language and aggregating the mean of ReviewRatio, Owners, and Recommendations
+language_stats = df_expanded.groupby("Language", observed=True).agg({
+    "ReviewRatio": "mean",
+    "EstimatedOwnersNumeric": "mean",
+    "Recommendations": "mean",
+    "AppID": "count" # Number of games supporting this language
+}).rename(columns={"AppID": "GameCount"}).reset_index()
 
-# TODO: Step 6 - Create heatmap
-# Rows: Languages, Columns: Avg Review Ratio, Avg Estimated Owners (normalized)
-# Color intensity shows performance
+# Filtering languages with a minimum number of games
+relevant_languages = language_stats[language_stats["GameCount"] >= 50].copy()
 
-# TODO: Step 7 - Analyze language combinations
-# Which combinations (e.g., EN + PT-BR + ES) yield best results?
+print(f"\nMetrics for relevant languages (>= 50 games):")
+print(relevant_languages.sort_values(by="EstimatedOwnersNumeric", ascending=False).head(10))
 
-# TODO: Step 8 - Print strategic insights about localization priorities for Brazilian developers
+# Determine the Ideal Language (Sweet Spot) / Normalize metrics
+relevant_languages["OwnersNorm"] = relevant_languages["EstimatedOwnersNumeric"] / relevant_languages["EstimatedOwnersNumeric"].max()
+relevant_languages["RecsNorm"] = relevant_languages["Recommendations"] / relevant_languages["Recommendations"].max()
+
+# Calculating a Balance Score - Owners 40%, ReviewRatio 40%, Recommendations 20%
+relevant_languages["BalanceScore"] = (
+    relevant_languages["OwnersNorm"] * 0.4 +
+    relevant_languages["ReviewRatio"] * 0.4 +
+    relevant_languages["RecsNorm"] * 0.2
+)
+
+# Saving the best language with idxmax
+best_language = relevant_languages.loc[relevant_languages["BalanceScore"].idxmax()]
+
+print(f"\nIdeal Language (Highest Balance Score): {best_language['Language']}")
+print(f"  Balance Score: {best_language['BalanceScore']:.3f}")
+print(f"  Average Review Ratio: {best_language['ReviewRatio']:.3f}")
+print(f"  Average Owners: {best_language['EstimatedOwnersNumeric']:,.0f}")
+print(f"  Game Count: {best_language['GameCount']}")
+
+# Comparing games with PT-BR vs without: EstimatedOwners, ReviewRatio, Recommendations
+# Use the original, non-expanded DF for comparison
+df_ptbr = df.copy()
+
+# Identifying games that support Portuguese - Brazil
+df_ptbr['Has_PT_BR'] = df_ptbr['SupportedLanguages'].str.contains('Portuguese - Brazil|Brazilian Portuguese', case=False, na=False)
+
+# Group and aggregate
+ptbr_comparison_stats = df_ptbr.groupby('Has_PT_BR', observed=True).agg({
+    'EstimatedOwnersNumeric': 'mean',
+    'ReviewRatio': 'mean',
+    'Recommendations': 'mean',
+    'AppID': 'count'
+}).rename(index={True: 'With PT-BR', False: 'Without PT-BR'}).rename(columns={'AppID': 'GameCount'})
+
+print("\nComparison: Games with PT-BR vs. Without PT-BR Support:")
+print(ptbr_comparison_stats)
+
+
+
+
 
 # End of Question 10
 
